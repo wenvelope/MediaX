@@ -15,6 +15,46 @@ import java.io.*
 import java.util.*
 
 /**
+ * @param context 上下文
+ * @param file 用来保存到外部共享目录的Picture文件夹下的已经存在的媒体文件
+ *
+ * 安卓10以上通过uri插入
+ * 安卓10一下直接通知扫盘
+ *
+ */
+fun savePhotoIntoPicturesFromInnerStorage(context: Context,file: File):Boolean{
+    context.apply {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val values = ContentValues()
+            values.put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
+            values.put(MediaStore.MediaColumns.MIME_TYPE, getMimeType(file))
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            val contentResolver: ContentResolver = contentResolver
+            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+                ?: return false
+            try {
+                val outputStream = contentResolver.openOutputStream(uri)
+                val fileInputStream = FileInputStream(file)
+                FileUtils.copy(fileInputStream, outputStream!!)
+                fileInputStream.close()
+                outputStream.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+
+        } else {
+            MediaScannerConnection.scanFile(
+                context,
+                arrayOf(file.absolutePath),
+                arrayOf("image/jpeg")
+            ) { _: String?, _: Uri? -> }
+        }
+    }
+    return true
+}
+
+
+/**
  * 保存到相册
  *
  * @param src  源图片

@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.wuhongru.mylibrary.savePhotoAlbum
+import com.wuhongru.mylibrary.savePhotoIntoPicturesFromInnerStorage
 import java.io.File
 
 
@@ -18,22 +19,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Thread{
-            val bitmap = getBitmap(this,R.drawable.ic_baseline_3d_rotation_24)
+//            val bitmap = getBitmap(this,R.drawable.ic_baseline_3d_rotation_24)
             val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),"1.png")
             if(!file.exists()){
                 Log.e("wuhongru","bucunzai")
                 file.createNewFile()
             }
-            if(bitmap==null){
-                Log.e("wuhongru","bitmap==null")
-            }
-            val s =savePhotoAlbum(this,bitmap,file)
+//            if(bitmap==null){
+//                Log.e("wuhongru","bitmap==null")
+//            }
+//            val s =savePhotoAlbum(this,bitmap,file)
+            val s = savePhotoIntoPicturesFromInnerStorage(this,file)
             Log.e("wuhongru",s.toString())
         }.start()
     }
 
     fun getBitmap(context: Context, vectorDrawableId: Int): Bitmap? {
-        val drawable = VectorDrawableCompat.create(context.getResources(), vectorDrawableId, null)
+        val drawable = VectorDrawableCompat.create(context.resources, vectorDrawableId, null)
             ?: return null
         val bitmap = Bitmap.createBitmap(
             drawable.intrinsicWidth,
