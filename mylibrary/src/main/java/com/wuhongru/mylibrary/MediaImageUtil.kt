@@ -20,7 +20,10 @@ import java.util.*
  * @param src  源图片
  * @param file 要保存到的文件
  */
-fun savePhotoAlbum(context:Context,src:Bitmap, file:File) {
+fun savePhotoAlbum(context:Context,src:Bitmap?, file:File):Boolean{
+    if(src == null){
+        return false
+    }
     context?.apply {
         //先保存到文件
         var outputStream:OutputStream?
@@ -38,10 +41,10 @@ fun savePhotoAlbum(context:Context,src:Bitmap, file:File) {
             val values = ContentValues()
             values.put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
             values.put(MediaStore.MediaColumns.MIME_TYPE, getMimeType(file))
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM)
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
             val contentResolver: ContentResolver = contentResolver
             val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-                ?: return
+                ?: return false
             try {
                 outputStream = contentResolver.openOutputStream(uri)
                 val fileInputStream = FileInputStream(file)
@@ -60,6 +63,7 @@ fun savePhotoAlbum(context:Context,src:Bitmap, file:File) {
             ) { _: String?, _: Uri? -> }
         }
     }
+    return true
 }
 
 
